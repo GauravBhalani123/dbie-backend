@@ -12,6 +12,18 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+class ProductCreate(BaseModel):
+    name: str
+    category: str
+    target_industry: str
+    description: Optional[str] = None
+
+class ProductResponse(ProductCreate):
+    id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
 class BusinessCreate(BaseModel):
     name: str
     industry: str
@@ -41,6 +53,11 @@ class BusinessResponse(BusinessCreate):
     id: int
     created_at: datetime
     scores: Optional[LeadScoreResponse] = None
-    
+    class Config:
+        from_attributes = True
+
+class SignalResponse(SignalCreate):
+    id: int
+    created_at: datetime
     class Config:
         from_attributes = True
