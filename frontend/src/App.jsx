@@ -5,12 +5,12 @@ function App() {
   const [businesses, setBusinesses] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/dashboard/')
+    fetch('https://dbie-engine-api.onrender.com/api/dashboard/')
       .then(r => r.json())
       .then(data => setStats(data))
       .catch(e => console.error(e));
-      
-    fetch('http://localhost:8000/api/businesses/')
+
+    fetch('https://dbie-engine-api.onrender.com/api/businesses/')
       .then(r => r.json())
       .then(data => setBusinesses(data))
       .catch(e => console.error(e));
@@ -21,7 +21,7 @@ function App() {
       <div className="header">
         <h1>🚀 Deep Business Intelligence Engine</h1>
       </div>
-      
+
       {stats && (
         <div className="stats-grid">
           <div className="stat-card hot">
