@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Business Intelligence Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">🚀</span>
+                <h1>Deep Business Intelligence Engine</h1>
+            </div>
+            <p>Enter business data signals to infer need detection instantly.</p>
+        </header>
+
+        <main class="grid-layout">
+            <section class="glass-panel input-section">
+                <h2>Analyze New Business</h2>
+                <form id="intelligenceForm">
+                    <div class="form-group">
+                        <label for="businessName">Business Name</label>
+                        <input type="text" id="businessName" placeholder="e.g. XYZ Steel Traders" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="keywords">Keywords Found (comma separated)</label>
+                        <input type="text" id="keywords" placeholder="e.g. Dharamkanta, Weighbridge, 100 Ton">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="infrastructure">Infrastructure Indicators</label>
+                        <input type="text" id="infrastructure" placeholder="e.g. Large Yard Space, Scale, 24x7">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="website">Website / Style</label>
+                        <input type="text" id="website" placeholder="e.g. Outdated 2014-2016 style, none">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="cloudMention">
+                            <label for="cloudMention">Cloud Mention</label>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="erpMention">
+                            <label for="erpMention">ERP Mention</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hiring">Hiring Activity</label>
+                        <input type="text" id="hiring" placeholder="e.g. Weighbridge Operator, Billing Exec">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="size">Estimated Size & Operations</label>
+                        <input type="text" id="size" placeholder="e.g. Multiple Trucks, Bulk Supply">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reviews">Reviews Summary</label>
+                        <input type="text" id="reviews" placeholder="e.g. High truck traffic, manual slips">
+                    </div>
+
+                    <button type="submit" class="primary-btn glow-btn">
+                        <span>Analyze Need</span>
+                        <div class="spinner" id="btnSpinner" style="display: none;"></div>
+                    </button>
+                </form>
+            </section>
+
+            <section class="glass-panel results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h2>Intelligence Output</h2>
+                    <span id="leadCategoryBadge" class="badge"></span>
+                </div>
+                
+                <div class="score-grid">
+                    <div class="score-card">
+                        <div class="score-title">Asset Presence</div>
+                        <div class="score-value" id="assetScore">--%</div>
+                        <div class="progress-bar"><div id="assetBar" class="progress-fill"></div></div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-title">Digital Maturity</div>
+                        <div class="score-value" id="digitalScore">--</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="score-title">Complexity Score</div>
+                        <div class="score-value" id="complexityScore">--%</div>
+                        <div class="progress-bar"><div id="complexityBar" class="progress-fill"></div></div>
+                    </div>
+                    <div class="score-card highlight-card">
+                        <div class="score-title">Upgrade Probability</div>
+                        <div class="score-value highlight-value" id="upgradeScore">--%</div>
+                    </div>
+                </div>
+
+                <div class="action-card">
+                    <h3>🧠 Recommended Sales Action</h3>
+                    <p id="recommendedAction">Awaiting analysis...</p>
+                </div>
+            </section>
+        </main>
+
+        <div class="divider"></div>
+
+        <section class="leads-section">
+            <h2>Recent Leads Evaluated</h2>
+            <div class="table-container">
+                <table id="leadsTable">
+                    <thead>
+                        <tr>
+                            <th>Business Name</th>
+                            <th>Need Prob.</th>
+                            <th>Category</th>
+                            <th>Extracted Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leadsBody">
+                        <tr><td colspan="4" class="text-center">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
