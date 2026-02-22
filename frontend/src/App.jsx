@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Navbar from "./components/Navbar";
 import { useState } from "react";
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
 
   return (
     <Router>
+      <Navbar />
       <div className="app-container">
         <Routes>
           <Route path="/login" element={<Login setAuth={setIsAuthenticated} />} />

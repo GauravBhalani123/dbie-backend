@@ -1,151 +1,141 @@
-def analyze_universal_need(product_name: str, business: dict, signals: list):
-    product_name_lower = product_name.lower()
+import re
+
+def analyze_advanced_lead(product_name: str, lead_data: dict, signals: list):
+    product = product_name.lower()
     
-    # Defaults
-    industry_score = 50.0
-    asset_score = 0.0
+    # Extract text from signals
+    all_text = " ".join([s.get('value', '').lower() for s in signals])
+    if lead_data.get('description'): all_text += " " + lead_data['description'].lower()
+    if lead_data.get('industry'): all_text += " " + lead_data['industry'].lower()
+    
+    # Default outputs
+    asset_prob = 0.0
     digital_score = 100.0
-    operational_score = 30.0
-
-    keywords = []
-    infrastructures = []
-    hirings = []
-    reviews = []
+    operational_score = 0.0
+    upgrade_prob = 0.0
+    it_service_prob = 0.0
+    hidden_need = False
     
-    # Process inputs
-    for s in signals:
-        val = s['value'].lower()
-        if s['signal_type'] == "keyword": keywords.append(val)
-        elif s['signal_type'] == "infrastructure": infrastructures.append(val)
-        elif s['signal_type'] == "hiring": hirings.append(val)
-        elif s['signal_type'] == "review": reviews.append(val)
-
-    # 1. LAYER 1: Asset Presence Detection (Dynamic Logic depending on Product)
-    if "weighbridge" in product_name_lower or "scale" in product_name_lower:
-        asset_keywords = ['weighbridge', 'dharamkanta', 'truck scale', 'ton', 'weighing', 'kanta']
-        infra_keywords = ['warehouse', 'yard', 'storage', 'depot', 'factory', 'plant']
-        hiring_keywords = ['operator', 'weighbridge', 'kanta wala']
-    elif "pvc" in product_name_lower or "taps" in product_name_lower or "pipe" in product_name_lower:
-        asset_keywords = ['hardware', 'sanitary', 'plumbing', 'construction', 'building material', 'wholesale']
-        infra_keywords = ['godown', 'store room', 'warehouse', 'yard']
-        hiring_keywords = ['salesman', 'loader', 'delivery']
-    elif "erp" in product_name_lower or "software" in product_name_lower:
-        asset_keywords = ['billing', 'invoice', 'gst', 'accounts', 'inventory', 'multi-branch', 'tally']
-        infra_keywords = ['office', 'branches', 'headquarters']
-        hiring_keywords = ['accountant', 'data entry', 'clerk', 'computer operator']
-    else:
-        # Generic asset detection
-        asset_keywords = ['machinery', 'equipment', 'manufacturing', 'plant']
-        infra_keywords = ['building', 'factory', 'warehouse']
-        hiring_keywords = ['operator', 'technician', 'supervisor']
-
-    # Apply weighted Asset match
-    for k in keywords + reviews:
-        if any(x in k for x in asset_keywords):
-            asset_score += 25
-    for i in infrastructures + reviews:
-        if any(x in i for x in infra_keywords):
-            asset_score += 20
-    for h in hirings:
-        if any(x in h for x in hiring_keywords):
-            asset_score += 15
-
-    asset_score = min(100.0, asset_score)
-
-    # 2. LAYER 2: Digital Maturity Detection
-    has_erp_or_cloud = any('erp' in k or 'cloud' in k or 'software' in k for k in keywords + reviews)
-    has_api = any('api' in k or 'auto' in k for k in keywords)
-    
-    if business.get('website'):
-        if not has_erp_or_cloud and not has_api:
-            digital_score -= 30  # Website is just a brochure, likely outdated ops
-    else:
-        digital_score -= 50  # No digital footprint at all
+    # ---------------------------------------------------------
+    # PHASE 1: ASSET PRESENCE DETECTION
+    # ---------------------------------------------------------
+    if "weighbridge" in product or "scale" in product:
+        if any(k in all_text for k in ['weighbridge', 'dharamkanta', '100 ton', 'truck weighing', 'weight slip', 'truck loading', 'weighing service']):
+            asset_prob += 60
+        if "operator" in all_text: asset_prob += 20
+        if "truck" in all_text: asset_prob += 20
         
-    for h in hirings:
-        if any(x in h for x in ['billing', 'accounting', 'data entry', 'manual', 'tally']):
-            digital_score -= 20  # Relies heavily on manual data entries
+    elif "erp" in product or "software" in product:
+        if any(k in all_text for k in ['inventory', 'billing', 'excel', 'tally']):
+            asset_prob += 70
+        if "accountant" in all_text or "executive" in all_text:
+            asset_prob += 30
+            
+    elif "petrol" in product or "pump" in product:
+        if any(k in all_text for k in ['fuel station', 'nozzle', 'tank', 'shift']):
+            asset_prob += 80
+            
+    elif "pharma" in product:
+        if any(k in all_text for k in ['batch', 'expiry', 'drug', 'schedule h']):
+            asset_prob += 80
+            
+    elif "tap" in product or "plastic" in product:
+        if any(k in all_text for k in ['hardware', 'sanitary', 'plumbing', 'bulk']):
+            asset_prob += 80
+            
+    else:
+        # Generic
+        if "equipment" in all_text or "machinery" in all_text: asset_prob += 50
 
-    for r in reviews:
-        if any(x in r for x in ['slip', 'manual', 'delay', 'wait', 'paper']):
-            digital_score -= 25  # Reviews mention manual delays
+    asset_prob = min(100.0, asset_prob)
 
+    # ---------------------------------------------------------
+    # PHASE 2: DIGITAL MATURITY DETECTION
+    # ---------------------------------------------------------
+    if not lead_data.get('website'):
+        digital_score -= 40
+    if not any(k in all_text for k in ['cloud', 'api', 'erp', 'gst automation']):
+        digital_score -= 30
+    if any(k in all_text for k in ['manual slip', 'excel', 'paper']):
+        digital_score -= 20
+        
     digital_score = max(0.0, digital_score)
-    digital_gap = 100.0 - digital_score
-
-    # 3. LAYER 3: Operational Complexity
-    for i in infrastructures + remarks_list(business, reviews):
-        if any(x in i for x in ['large', 'multiple', 'yard space', 'branches', 'godowns']):
-            operational_score += 25
     
-    for k in keywords + reviews:
-        if any(x in k for x in ['bulk', 'wholesale', '24x7', 'trucks', 'heavy loading']):
-            operational_score += 30
+    digital_level = "HIGH"
+    if digital_score < 75: digital_level = "MEDIUM"
+    if digital_score < 50: digital_level = "LOW"
+    if digital_score < 25: digital_level = "VERY LOW"
 
+    # ---------------------------------------------------------
+    # PHASE 3: OPERATIONAL COMPLEXITY
+    # ---------------------------------------------------------
+    if any(k in all_text for k in ['24x7', 'multiple branch', 'bulk', 'trucks', 'large yard']):
+        operational_score += 40
     try:
-        emp_size = int(''.join(filter(str.isdigit, business.get('employee_size', '0'))))
-        if emp_size > 50: operational_score += 20
-        elif emp_size > 10: operational_score += 10
+        emp = int(re.sub(r'[^0-9]', '', str(lead_data.get('employee_size', '0'))) or 0)
+        if emp > 50: operational_score += 30
+        elif emp > 10: operational_score += 15
     except:
         pass
-
-    operational_score = min(100.0, operational_score)
-
-    # Industry specific boost (simplified for dynamic approach)
-    industry_match = 50.0
-    if product_name_lower[:3] in business.get('industry', '').lower():
-        industry_match += 30
-
-    # 4. LAYER 4: Need Probability Formula
-    need_score = (
-        (industry_match * 0.25) +
-        (asset_score * 0.30) +
-        (digital_gap * 0.25) +
-        (operational_score * 0.20)
-    )
-    need_score = min(100.0, round(need_score, 2))
-
-    # Close Probability considering digital gap scaling
-    close_probability = round(need_score * 0.85, 2)
-
-    if need_score >= 75: 
-        category = "Hot"
-    elif need_score >= 50: 
-        category = "Warm"
-    else: 
-        category = "Cold"
-
-    # AI Reasoning Logic
-    inference_reason = []
-    if asset_score > 50: inference_reason.append(f"Strong asset signals found relevant to {product_name}.")
-    if digital_gap > 50: inference_reason.append("High digital gap indicates severe need for modern system.")
-    if operational_score > 50: inference_reason.append("Complex operations require automated solutions.")
+        
+    operational_score = min(100.0, operational_score + 30) # Base 30
     
-    reason = " ".join(inference_reason) if inference_reason else "Generic matching found."
+    op_volume = "HIGH" if operational_score >= 70 else "MEDIUM" if operational_score >= 40 else "LOW"
 
-    action = "Nurture with introductory emails."
-    if category == "Hot":
-        if digital_gap > 70:
-            action = f"Call immediately. High chance of using manual systems. Pitch {product_name} as digital upgrade."
-        else:
-            action = f"Call and ask about current {product_name} efficiency & integration. Focus on operational scale."
-    elif category == "Warm":
-        action = "Send case studies regarding their specific industry pain points."
+    # ---------------------------------------------------------
+    # PHASE 4: SOFTWARE UPGRADE PROBABILITY
+    # ---------------------------------------------------------
+    if asset_prob > 0 and digital_level in ["LOW", "VERY LOW"] and op_volume == "HIGH":
+        upgrade_prob = 85.0
+    else:
+        upgrade_prob = (asset_prob * 0.4) + ((100-digital_score) * 0.3) + (operational_score * 0.3)
+        
+    upgrade_prob = min(100.0, round(upgrade_prob, 2))
+
+    # ---------------------------------------------------------
+    # PHASE 5: HIDDEN NEED DETECTOR
+    # ---------------------------------------------------------
+    if any(k in all_text for k in ['steel trading', 'bulk supply', 'large loading']):
+        if "weighbridge" not in all_text:
+            hidden_need = True
+            
+    # ---------------------------------------------------------
+    # PHASE 6: UNIVERSAL IT SERVICE DETECTION
+    # ---------------------------------------------------------
+    if any(k in all_text for k in ['migration', 'sap', 'tally', 'oracle', 'custom software', 'api']):
+        it_service_prob += 50
+    if any(k in all_text for k in ['inventory mismatch', 'manual process', 'old software']):
+        it_service_prob += 30
+        
+    it_service_prob = min(100.0, it_service_prob)
+
+    # ---------------------------------------------------------
+    # PHASE 7: FINAL INTELLIGENCE OUTPUT
+    # ---------------------------------------------------------
+    final_score = max(upgrade_prob, it_service_prob)
+    if hidden_need and "weighbridge" in product:
+        final_score = max(final_score, 75.0)
+
+    if final_score >= 75: category = "HOT"
+    elif final_score >= 50: category = "WARM"
+    else: category = "COLD"
+    
+    reasoning = []
+    if asset_prob > 50: reasoning.append(f"Strong asset signals for {product_name}.")
+    if digital_level in ["LOW", "VERY LOW"]: reasoning.append("Low digital maturity indicates need for upgrade.")
+    if op_volume == "HIGH": reasoning.append("High operational volume requires automated systems.")
+    if hidden_need: reasoning.append("Hidden need detected based on bulk operations.")
+    if it_service_prob > 50: reasoning.append("Strong signals for IT service requirements.")
 
     return {
-        "business_name": business.get('name', 'Unknown'),
-        "asset_presence": asset_score,
-        "digital_maturity": digital_score,
-        "operational_complexity": operational_score,
-        "product_need_probability": need_score,
-        "close_probability": close_probability,
+        "business_name": lead_data.get('name', 'Unknown'),
+        "industry": lead_data.get('industry', 'Unknown'),
+        "asset_presence_probability": asset_prob,
+        "digital_maturity_score": digital_score,
+        "operational_complexity_score": operational_score,
+        "software_upgrade_probability": upgrade_prob,
+        "it_service_need_probability": it_service_prob,
+        "hidden_need_detected": hidden_need,
         "lead_category": category,
-        "inference_reason": reason,
-        "recommended_sales_action": action
+        "reasoning_summary": " ".join(reasoning) if reasoning else "Standard evaluation."
     }
-
-def remarks_list(business, reviews):
-    l = list(reviews)
-    if business.get('description'): l.append(business['description'].lower())
-    if business.get('industry'): l.append(business['industry'].lower())
-    return l

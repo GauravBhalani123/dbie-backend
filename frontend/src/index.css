@@ -221,3 +221,187 @@ body {
   font-size: 14px;
   border: 1px solid rgba(255, 123, 114, 0.4);
 }
+
+/* ------------------------------------- */
+/* NAVBAR STYLES (Salesforce Style)      */
+/* ------------------------------------- */
+
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 2px solid #e5e7eb;
+  padding: 0 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #1e293b;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+}
+
+.navbar-left,
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #00a1e0;
+  /* Similar to Salesforce Blue */
+  text-decoration: none;
+  margin-right: 30px;
+}
+
+.logo-icon {
+  font-size: 28px;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 24px;
+}
+
+.nav-link {
+  color: #0f172a;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 0;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #00a1e0;
+}
+
+.dropdown .nav-link {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 6px 12px;
+  background: #f8fafc;
+  width: 250px;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 4px 8px;
+  width: 100%;
+  color: #334155;
+  font-size: 14px;
+}
+
+.search-icon {
+  color: #00a1e0;
+  font-size: 14px;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 13px;
+}
+
+.contact-text {
+  color: #64748b;
+}
+
+.contact-number {
+  color: #00a1e0;
+  font-weight: 600;
+}
+
+.btn-login,
+.btn-logout {
+  background-color: #2e844a;
+  /* Salesforce Green-like */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.btn-login:hover,
+.btn-logout:hover {
+  background-color: #216637;
+}
+
+/* We need to adjust the app background if using a light navbar */
+body {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.header h1 {
+  color: #0f172a;
+}
+
+.section-title h2 {
+  color: #0f172a;
+  border-bottom-color: #cbd5e1;
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card h3 {
+  color: #64748b;
+}
+
+.stat-card h2 {
+  color: #0f172a;
+}
+
+.table {
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table th {
+  background: #f8fafc;
+  color: #475569;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.table td {
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
