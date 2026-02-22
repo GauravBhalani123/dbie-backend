@@ -27,14 +27,15 @@ class Business(Base):
     website = Column(String)
     employee_size = Column(String)
     description = Column(String)
+    status = Column(String, default="Pending") # Pending, Follow-up, Closed, Reminders
     created_at = Column(DateTime, default=datetime.utcnow)
-    signals = relationship("Signal", back_populates="business")
-    scores = relationship("LeadScore", back_populates="business", uselist=False)
+    signals = relationship("Signal", back_populates="business", cascade="all, delete-orphan")
+    scores = relationship("LeadScore", back_populates="business", uselist=False, cascade="all, delete-orphan")
 
 class Signal(Base):
     __tablename__ = "signals"
     id = Column(Integer, primary_key=True, index=True)
-    business_id = Column(Integer, ForeignKey("businesses.id"))
+    business_id = Column(Integer, ForeignKey("businesses.id", ondelete="CASCADE"))
     signal_type = Column(String)
     value = Column(String)
     weight = Column(Integer, default=1)
@@ -45,7 +46,7 @@ class Signal(Base):
 class LeadScore(Base):
     __tablename__ = "lead_scores"
     id = Column(Integer, primary_key=True, index=True)
-    business_id = Column(Integer, ForeignKey("businesses.id"), unique=True)
+    business_id = Column(Integer, ForeignKey("businesses.id", ondelete="CASCADE"), unique=True)
     industry_score = Column(Float)
     asset_score = Column(Float)
     digital_score = Column(Float)
@@ -54,5 +55,6 @@ class LeadScore(Base):
     close_probability = Column(Float)
     category = Column(String)
     recommendation = Column(String)
+    product_matched = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
     business = relationship("Business", back_populates="scores")

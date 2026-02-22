@@ -31,13 +31,22 @@ class BusinessCreate(BaseModel):
     website: Optional[str] = None
     employee_size: Optional[str] = None
     description: Optional[str] = None
+    status: Optional[str] = "Pending"
 
-class SignalCreate(BaseModel):
-    business_id: int
+class SignalBase(BaseModel):
     signal_type: str
     value: str
     weight: Optional[int] = 1
     source: Optional[str] = None
+
+class SignalCreate(SignalBase):
+    business_id: int
+
+class SignalResponse(SignalCreate):
+    id: int
+    created_at: datetime
+    class Config:
+        from_attributes = True
 
 class LeadScoreResponse(BaseModel):
     industry_score: float
@@ -48,16 +57,28 @@ class LeadScoreResponse(BaseModel):
     close_probability: float
     category: str
     recommendation: str
+    product_matched: Optional[str] = None
 
 class BusinessResponse(BusinessCreate):
     id: int
     created_at: datetime
     scores: Optional[LeadScoreResponse] = None
+    signals: Optional[List[SignalResponse]] = []
     class Config:
         from_attributes = True
 
-class SignalResponse(SignalCreate):
-    id: int
-    created_at: datetime
-    class Config:
-        from_attributes = True
+class AnalyzeProductRequest(BaseModel):
+    product_name: str
+    business: BusinessCreate
+    signals: List[SignalBase]
+
+class AnalyzeProductResponse(BaseModel):
+    business_name: str
+    asset_presence: float
+    digital_maturity: float
+    operational_complexity: float
+    product_need_probability: float
+    close_probability: float
+    lead_category: str
+    inference_reason: str
+    recommended_sales_action: str
